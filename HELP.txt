@@ -1,0 +1,9 @@
+Usage:
+
+    cipher:e
+    cipher:encrypt $file_name
+        Encrypts a file or folder.
+
+    cipher:d
+    cipher:decrypt $file_name
+        Decrypts an encrypted file.

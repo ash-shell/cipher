@@ -1,0 +1,4 @@
+name: cipher
+package: github.com/ash-shell/cipher
+default_alias: cipher
+callable_prefix: Cipher
