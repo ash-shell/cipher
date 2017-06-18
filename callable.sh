@@ -48,16 +48,23 @@ Cipher__callable_encrypt() {
         Logger__error "Password must be non-empty"
         return 1
     fi
+    Logger__prompt "Confirm encryption password: "; read -s cpassword; echo
+    if [[ "$cpassword" != "$password" ]]; then
+        Logger__error "Passwords do not match"
+        return 1
+    fi
 
     # If it's a file
     if [[ -f "$1" ]]; then
         # Encrypt
-        openssl aes-256-cbc -a -e -salt -in "$1" -out "$1.enc" -pass file:<( echo -n "$password" )  > /dev/null 2>&1
+        local encrypt_file="$1.enc"
+        openssl aes-256-cbc -a -e -salt -in "$1" -out "$encrypt_file" -pass file:<( echo -n "$password" )  > /dev/null 2>&1
         if [[ $? -ne 0 ]]; then
             Logger__error "Bad encrypt"
             return 1
         fi
         rm "$1"
+        Logger__success "File encrypted at $encrypt_file"
 
     # Else, it's a directory
     else
@@ -72,12 +79,14 @@ Cipher__callable_encrypt() {
         rm -r "$file"
 
         # Encrypt
-        openssl aes-256-cbc -a -e -salt -in "$zip_file" -out "$zip_file.enc" -pass file:<( echo -n "$password" )  > /dev/null 2>&1
+        local encrypt_file="$zip_file.enc"
+        openssl aes-256-cbc -a -e -salt -in "$zip_file" -out "$encrypt_file" -pass file:<( echo -n "$password" )  > /dev/null 2>&1
         if [[ $? -ne 0 ]]; then
             Logger__error "Bad encrypt"
             return 1
         fi
         rm "$zip_file"
+        Logger__success "Directory encrypted at $encrypt_file"
     fi
 }
 
@@ -132,5 +141,8 @@ Cipher__callable_decrypt() {
     if [[ "$out_file" =~ .*.tar.gz ]]; then
         gunzip -c "$out_file" | tar xopf -
         rm $out_file
+        Logger__success "Directory decrypted at $(echo "$out_file" | sed 's/\.tar\.gz$//g')/"
+    else
+        Logger__success "File decrypted at $out_file"
     fi
 }
