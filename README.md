@@ -15,6 +15,10 @@ After you have Ash installed, run either one of these two commands depending on 
 
 You can optionally install this globally by adding `--global` to the end of the command.
 
+## In Action
+
+[![asciicast](https://asciinema.org/a/mpqCO2c006ZtafUoHLf0NoFNE.png)](https://asciinema.org/a/mpqCO2c006ZtafUoHLf0NoFNE)
+
 ## Usage
 
 ```
