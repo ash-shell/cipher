@@ -55,7 +55,7 @@ Cipher__callable_encrypt() {
     fi
 
     # Encrypt the file
-    Cipher__encrypt "$1" "$password"
+    Cipher__encrypt "$1" "$password" "$Ash__TRUE"
 }
 
 ##################################################
@@ -94,5 +94,5 @@ Cipher__callable_decrypt() {
     fi
 
     # Decrypt
-    Cipher__decrypt "$1" "$password"
+    Cipher__decrypt "$1" "$password" "$Ash__TRUE"
 }

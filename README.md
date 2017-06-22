@@ -1,5 +1,7 @@
 # Cipher
 
+[![Build Status](https://travis-ci.org/ash-shell/cipher.svg?branch=master)](https://travis-ci.org/ash-shell/cipher)
+
 Cipher is an [Ash](https://github.com/ash-shell/ash) module that makes it easy to perform aes-256-cbc encryption for files and directories.
 
 ## Getting started

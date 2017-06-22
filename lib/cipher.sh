@@ -5,6 +5,8 @@
 #
 # @param $1: The file or directory to encrypt
 # @param $2: The password
+# @param $3: Ash__TRUE to enable logging
+#            Ash__FALSE to disable logging
 ##################################################
 Cipher__encrypt() {
     # If it's a file
@@ -13,11 +15,11 @@ Cipher__encrypt() {
         local encrypt_file="$1.enc"
         openssl aes-256-cbc -a -e -salt -in "$1" -out "$encrypt_file" -pass file:<( echo -n "$2" )  > /dev/null 2>&1
         if [[ $? -ne 0 ]]; then
-            Logger__error "Bad encrypt"
-            return 1
+            if [[ $3 -eq $Ash__TRUE ]]; then Logger__error "Bad encrypt"; fi
+            return $Ash__FALSE
         fi
         rm "$1"
-        Logger__success "File encrypted at $encrypt_file"
+        if [[ $3 -eq $Ash__TRUE ]]; then Logger__success "File encrypted at $encrypt_file"; fi
 
     # Else, it's a directory
     else
@@ -26,8 +28,8 @@ Cipher__encrypt() {
         local zip_file="$file.tar.gz"
         tar czf "$zip_file" "$file"
         if [[ $? -ne 0 ]]; then
-            Logger__error "Bad encrypt"
-            return 1
+            if [[ $3 -eq $Ash__TRUE ]]; then Logger__error "Bad encrypt"; fi
+            return $Ash__FALSE
         fi
         rm -r "$file"
 
@@ -35,12 +37,13 @@ Cipher__encrypt() {
         local encrypt_file="$zip_file.enc"
         openssl aes-256-cbc -a -e -salt -in "$zip_file" -out "$encrypt_file" -pass file:<( echo -n "$2" )  > /dev/null 2>&1
         if [[ $? -ne 0 ]]; then
-            Logger__error "Bad encrypt"
-            return 1
+            if [[ $3 -eq $Ash__TRUE ]]; then Logger__error "Bad encrypt"; fi
+            return $Ash__FALSE
         fi
         rm "$zip_file"
-        Logger__success "Directory encrypted at $encrypt_file"
+        if [[ $3 -eq $Ash__TRUE ]]; then Logger__success "Directory encrypted at $encrypt_file"; fi
     fi
+    return $Ash__TRUE
 }
 
 ##################################################
@@ -48,6 +51,8 @@ Cipher__encrypt() {
 #
 # @param $1: The file or directory to decrypt
 # @param $2: The password
+# @param $3: Ash__TRUE to enable logging
+#            Ash__FALSE to disable logging
 ##################################################
 Cipher__decrypt() {
     # Decrypt
@@ -57,8 +62,8 @@ Cipher__decrypt() {
         if [[ -f "$out_file" ]]; then
             rm "$out_file";
         fi
-        Logger__error "Bad decrypt"
-        return 1
+        if [[ $3 -eq $Ash__TRUE ]]; then Logger__error "Bad decrypt"; fi
+        return $Ash__FALSE
     fi
     rm "$1"
 
@@ -66,8 +71,9 @@ Cipher__decrypt() {
     if [[ "$out_file" =~ .*.tar.gz ]]; then
         gunzip -c "$out_file" | tar xopf -
         rm $out_file
-        Logger__success "Directory decrypted at $(echo "$out_file" | sed 's/\.tar\.gz$//g')/"
+        if [[ $3 -eq $Ash__TRUE ]]; then Logger__success "Directory decrypted at $(echo "$out_file" | sed 's/\.tar\.gz$//g')/"; fi
     else
-        Logger__success "File decrypted at $out_file"
+        if [[ $3 -eq $Ash__TRUE ]]; then Logger__success "File decrypted at $out_file"; fi
     fi
+    return $Ash__TRUE
 }
